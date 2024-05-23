@@ -1,4 +1,8 @@
 # compiled output
+/client/dist
+/client/node_modules
+
+# compiled output
 /server/dist
 /server/node_modules
 
