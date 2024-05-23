@@ -1,3 +1,4 @@
+import { ChatLayout } from '@/components/page/home/ChatLayout';
 import Link from 'next/link';
 
 export default function Home() {
@@ -10,7 +11,7 @@ export default function Home() {
       </div>
 
       <div className='z-10 border rounded-lg max-w-5xl w-full h-full text-sm lg:flex'>
-        {/* <ChatLayout defaultLayout={defaultLayout} navCollapsedSize={8} /> */}
+        <ChatLayout />
       </div>
     </main>
   );
