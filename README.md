@@ -17,4 +17,7 @@ The server will start running at `localhost:4000`.
 
 ## Client
 
-To use the chat application, open the `index.html` file located in the client folder in your web browser. You can access the chat interface and start communicating with other users.
+```bash
+cd client
+pnpm dev
+```
