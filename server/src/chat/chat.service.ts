@@ -39,7 +39,6 @@ export class ChatService implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('new-message')
   handleNewMessage(client: Socket, message: INewMessage) {
-    console.log('🚀 ~ ChatService ~ handleNewMessage ~ message:', message);
     // Broadcast message
     this.server.emit('message', { ...message, id: client.id });
   }

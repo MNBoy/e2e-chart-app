@@ -1,6 +1,5 @@
 import { IMessage } from '@/interfaces/IMessage';
 import { Tools } from '@/lib/tools';
-import { useState } from 'react';
 import { io } from 'socket.io-client';
 
 let socket = io('http://localhost:4000');
@@ -20,9 +19,37 @@ socket.on('encryption-key', async (receivedKey) => {
   key = decodedKey;
 });
 
-const useChatLayout = () => {
-  const [messagesState, setMessages] = useState<IMessage[]>([]);
+// Handle user join notification
+socket.on('user-joined', (data) => {
+  const messageElement = document.createElement('div');
+  messageElement.textContent = data.message;
+  messageElement.classList.add('text-green-600');
+  document.getElementById('messages')?.appendChild(messageElement);
+});
 
+// Handle user leave notification
+socket.on('user-left', (data) => {
+  const messageElement = document.createElement('div');
+  messageElement.textContent = data.message;
+  messageElement.classList.add('text-red-600');
+  document.getElementById('messages')?.appendChild(messageElement);
+});
+
+socket.on('message', async (data) => {
+  const iv = new Uint8Array(data.iv);
+  const encryptedMessage = new Uint8Array(data.message);
+  const decryptedMessage = await Tools.decryptMessage(
+    key,
+    encryptedMessage,
+    iv
+  );
+
+  const messageElement = document.createElement('div');
+  messageElement.textContent = `${data.id}: ${decryptedMessage}`;
+  document.getElementById('messages')?.appendChild(messageElement);
+});
+
+const useChatLayout = () => {
   const sendMessage = async (newMessage: IMessage) => {
     const encryptedData = await Tools.encryptMessage(key, newMessage);
     socket.emit('new-message', {
@@ -31,7 +58,7 @@ const useChatLayout = () => {
     });
   };
 
-  return { messagesState, sendMessage };
+  return { sendMessage };
 };
 
 export default useChatLayout;

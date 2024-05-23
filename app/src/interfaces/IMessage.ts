@@ -1,4 +1,5 @@
 export interface IMessage {
-  iv: string;
+  key?: CryptoKey;
+  iv: BufferSource;
   message: string;
 }
