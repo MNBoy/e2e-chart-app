@@ -58,7 +58,22 @@ const useChatLayout = () => {
     });
   };
 
-  return { sendMessage };
+  const sendFile = async (file: File) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const fileData = reader.result as ArrayBuffer;
+      console.log('🚀 ~ reader.onload= ~ fileData:', fileData);
+      const encryptedData = await Tools.encryptMessage(key, {
+        message: fileData,
+      });
+      socket.emit('new-file', {
+        iv: Array.from(encryptedData.iv),
+        file: Array.from(new Uint8Array(encryptedData.encryptedMessage)),
+      });
+    };
+  };
+
+  return { sendMessage, sendFile };
 };
 
 export default useChatLayout;

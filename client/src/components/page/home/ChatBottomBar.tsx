@@ -1,25 +1,30 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { IMessage } from '@/interfaces/IMessage';
-import { SendHorizontal } from 'lucide-react';
-import React, { FC, useRef, useState } from 'react';
+import { Paperclip, SendHorizontal } from 'lucide-react';
+import React, { ChangeEvent, FC, useRef, useState } from 'react';
 
 interface IProps {
   sendMessage: (newMessage: IMessage) => void;
+  sendFile: (file: File) => void;
 }
 
-export const ChatBottomBar: FC<IProps> = ({ sendMessage }) => {
+export const ChatBottomBar: FC<IProps> = ({ sendMessage, sendFile }) => {
   const [message, setMessage] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
   };
 
+  const handleButtonClick = () => {
+    fileRef!.current!.click();
+  };
+
   const handleSend = () => {
     if (message.trim()) {
       const newMessage: IMessage = {
-        iv: 'test',
         message: message.trim(),
       };
 
@@ -29,6 +34,13 @@ export const ChatBottomBar: FC<IProps> = ({ sendMessage }) => {
       if (inputRef.current) {
         inputRef.current.focus();
       }
+    }
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      sendFile(file);
     }
   };
 
@@ -46,6 +58,18 @@ export const ChatBottomBar: FC<IProps> = ({ sendMessage }) => {
 
   return (
     <div className='p-2 flex justify-between w-full items-center gap-2'>
+      <Button
+        className='size-9 p-0 bg-transparent hover:bg-gray-300'
+        onClick={handleButtonClick}
+      >
+        <Paperclip size={20} className='text-muted-foreground' />
+        <input
+          type='file'
+          ref={fileRef}
+          className='hidden'
+          onChange={handleFileChange}
+        />
+      </Button>
       <Textarea
         autoComplete='off'
         value={message}

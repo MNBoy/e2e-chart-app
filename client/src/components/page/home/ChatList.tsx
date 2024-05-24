@@ -4,9 +4,10 @@ import { ChatBottomBar } from './ChatBottomBar';
 
 interface IProps {
   sendMessage: (newMessage: IMessage) => void;
+  sendFile: (file: File) => void;
 }
 
-export const ChatList: FC<IProps> = ({ sendMessage }) => {
+export const ChatList: FC<IProps> = ({ sendMessage, sendFile }) => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -17,7 +18,7 @@ export const ChatList: FC<IProps> = ({ sendMessage }) => {
       >
         <div id='messages' className='p-1' />
       </div>
-      <ChatBottomBar sendMessage={sendMessage} />
+      <ChatBottomBar sendMessage={sendMessage} sendFile={sendFile} />
     </div>
   );
 };
