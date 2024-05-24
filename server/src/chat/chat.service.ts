@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import * as crypto from 'crypto';
 import { Server, Socket } from 'socket.io';
-import { INewMessage } from './interfaces';
+import { INewFile, INewMessage } from './interfaces';
 
 const socketPort: number = +process.env.SOCKET_PORT || 4000;
 
@@ -41,5 +41,11 @@ export class ChatService implements OnGatewayConnection, OnGatewayDisconnect {
   handleNewMessage(client: Socket, message: INewMessage) {
     // Broadcast message
     this.server.emit('message', { ...message, id: client.id });
+  }
+
+  @SubscribeMessage('new-message')
+  handleNewFile(client: Socket, message: INewFile) {
+    // Broadcast message
+    this.server.emit('file', { ...message, id: client.id });
   }
 }
