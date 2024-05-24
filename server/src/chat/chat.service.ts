@@ -43,7 +43,7 @@ export class ChatService implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message', { ...message, id: client.id });
   }
 
-  @SubscribeMessage('new-message')
+  @SubscribeMessage('new-file')
   handleNewFile(client: Socket, message: INewFile) {
     // Broadcast message
     this.server.emit('file', { ...message, id: client.id });
