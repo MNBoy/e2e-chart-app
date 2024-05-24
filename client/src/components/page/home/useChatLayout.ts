@@ -24,7 +24,10 @@ socket.on('user-joined', (data) => {
   const messageElement = document.createElement('div');
   messageElement.textContent = data.message;
   messageElement.classList.add('text-green-600');
-  document.getElementById('messages')?.appendChild(messageElement);
+
+  const messagesContainer = document.getElementById('messages');
+  messagesContainer?.appendChild(messageElement);
+  messagesContainer?.scrollTo(0, messagesContainer.scrollHeight);
 });
 
 // Handle user leave notification
@@ -32,7 +35,10 @@ socket.on('user-left', (data) => {
   const messageElement = document.createElement('div');
   messageElement.textContent = data.message;
   messageElement.classList.add('text-red-600');
-  document.getElementById('messages')?.appendChild(messageElement);
+
+  const messagesContainer = document.getElementById('messages');
+  messagesContainer?.appendChild(messageElement);
+  messagesContainer?.scrollTo(0, messagesContainer.scrollHeight);
 });
 
 socket.on('message', async (data) => {
@@ -46,7 +52,37 @@ socket.on('message', async (data) => {
 
   const messageElement = document.createElement('div');
   messageElement.textContent = `${data.id}: ${decryptedMessage}`;
-  document.getElementById('messages')?.appendChild(messageElement);
+
+  const messagesContainer = document.getElementById('messages');
+  messagesContainer?.appendChild(messageElement);
+  messagesContainer?.scrollTo(0, messagesContainer.scrollHeight);
+});
+
+socket.on('file', async (data) => {
+  const fileData = new Uint8Array(data.file);
+  const fileName = data.fileName || 'received_file';
+  const fileType = data.fileType || 'application/octet-stream';
+
+  // Create Blob from ArrayBuffer
+  const blob = new Blob([fileData], { type: fileType });
+
+  // Create File object from Blob
+  const file = new File([blob], fileName);
+
+  // Create download link
+  const url = URL.createObjectURL(file);
+  const messageElement = document.createElement('a');
+  messageElement.href = url;
+  messageElement.download = fileName;
+  messageElement.textContent = `${data.id} sends a file: ${fileName}`;
+
+  // Add Tailwind CSS classes
+  messageElement.classList.add(...'text-cyan-600 underline w-fit'.split(' '));
+
+  // Append download link to messages container
+  const messagesContainer = document.getElementById('messages');
+  messagesContainer?.appendChild(messageElement);
+  messagesContainer?.scrollTo(0, messagesContainer.scrollHeight);
 });
 
 const useChatLayout = () => {
@@ -58,7 +94,20 @@ const useChatLayout = () => {
     });
   };
 
-  return { sendMessage };
+  const sendFile = async (file: File) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const fileData = reader.result as ArrayBuffer;
+      socket.emit('new-file', {
+        file: fileData,
+        fileName: file.name,
+        fileType: file.type,
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  return { sendMessage, sendFile };
 };
 
 export default useChatLayout;
